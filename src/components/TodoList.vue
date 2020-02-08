@@ -4,9 +4,11 @@
     <div>Ransel ku</div>
     <input type="text" class="todo-input" placeholder="Barang"
     v-model="newTodo" @keyup.enter="addTodo">
-    <transition-group name="fade" enter-active-class="animated fadeInUp faster" leave-active-class="animated hinge fast">
-    <div v-for="(todo, index) in todosFiltered" :key="todo.id" class="todo-item">
-        <div class="todo-item-left">
+    <transition-group name="fade" enter-active-class="animated fadeInUp faster" leave-active-class="animated fadeOutDown faster">
+    <todo-item v-for="(todo, index) in todosFiltered" 
+    :key="todo.id" :todo="todo" :index="index" :checkAll="!anyRemaining"
+    @removedTodo="removeTodo" @finishedEdit="finishedEdit">
+        <!-- <div class="todo-item-left">
             
             <input type="checkbox" v-model="todo.completed">
             
@@ -21,8 +23,8 @@
         </div>
         <div class="remove-item" @click="removeTodo(index)">
             &times;
-        </div>
-    </div>
+        </div> -->
+    </todo-item>
     </transition-group>
     <div class="extra-container">
         <div><label><input type="checkbox" :checked="anyRemaining" 
@@ -46,8 +48,12 @@
 </template>
 
 <script>
+import TodoItem from './TodoItem'
 export default {
   name: 'TodoList',
+  components: {
+    TodoItem,
+  },
   data () {
     return {
         newTodo: '',
@@ -76,13 +82,7 @@ export default {
         ]
     }
     },
-    directives: {
-        focus: {
-            inserted: function (el) {
-                el.focus()
-            }
-        }
-    },
+    
     computed: {
         remaining() {
             return this.todos.filter(todo => !todo.completed).length
@@ -139,6 +139,9 @@ export default {
         },
         clearCompleted() {
             this.todos = this.todos.filter(todo => !todo.completed  )
+        },
+        finishedEdit(data) {
+            this.todos.splice(data.index, 1, data.todo)
         }
     },
         
